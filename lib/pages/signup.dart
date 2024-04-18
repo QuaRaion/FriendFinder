@@ -19,6 +19,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: accentColor),
       home: Scaffold(
         resizeToAvoidBottomInset: false,

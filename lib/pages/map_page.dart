@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:vers2/design/colors.dart';
 import 'search_event.dart';
+import 'package:flutter/cupertino.dart';
 import 'NavBar.dart';
 
 class _MapPageState extends State<MapPage> {
   late final MapController _mapController;
   LatLng? _userLocation;
+  int _selectedIndex = 0; // Индекс выбранного элемента нижней панели навигации
 
   @override
   void initState() {
@@ -45,11 +48,19 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
+  // Метод для переключения между страницами на основе выбранного элемента
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          // Ваш FlutterMap
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
@@ -64,7 +75,7 @@ class _MapPageState extends State<MapPage> {
             ],
           ),
 
-
+          // Ваш поиск
           Positioned(
             top: 50,
             left: 16,
@@ -94,38 +105,117 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
+
+          Positioned(
+            bottom: 82,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      // Действия при нажатии на изображение
+                      print('Изображение нажато');
+                    },
+                    child: Image.asset(
+                      'assets/img/add_events.png', // Путь к вашему изображению PNG
+                      width: 100, // Размер изображения
+                      height: 100,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+
           Positioned(
             bottom: 16,
             left: 16,
             right: 16,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SearchScreen()),
-                );
-              },
-
-              child: const Text(
-                'Создать событие',
-                style: TextStyle(color: Colors.white),
-
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo.shade700,
-                textStyle: const TextStyle(fontSize: 22),
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        print('Изображение нажато');
+                        // Действия при нажатии на иконку геолокации
+                      },
+                      icon: Icon(CupertinoIcons.location_fill),
+                      color: accentColor, // Цвет иконки
+                      iconSize: 40, // Размер иконки
+                    ),
+                  ],
                 ),
-              ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SearchScreen()),
+                    );
+                  },
+                  child: Text(
+                    'Создать событие',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    textStyle: TextStyle(fontSize: 22),
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    minimumSize: Size(200, 50),
+                  ),
+                ),
+
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        print('Изображение нажато');
+                        // Действия при нажатии на иконку геолокации
+                      },
+                      icon: Icon(Icons.person),
+                      color: accentColor, // Цвет иконки
+                      iconSize: 50, // Размер иконки
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
+
         ],
       ),
+
     );
   }
 }
+
 
 class MapPage extends StatefulWidget {
   const MapPage({
