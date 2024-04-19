@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:vers2/design/colors.dart';
-import 'package:vers2/pages/map_page.dart';
+import 'map_page.dart';
 
 class CreateScreen extends StatefulWidget {
-  const CreateScreen.CreateScreen({super.key});
+  const CreateScreen({super.key});
 
   @override
   _CreateScreenState createState() => _CreateScreenState();
