@@ -111,8 +111,6 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
-
-
           Positioned(
             bottom: 16,
             left: 16,
@@ -161,12 +159,12 @@ class _MapPageState extends State<MapPage> {
                     minimumSize: const Size(200, 50),
                   ),
                   child: const Text(
-                    'Найти событие',
-                    style: TextStyle(
-                      color:Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                    )
+                      'Найти событие',
+                      style: TextStyle(
+                        color:Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      )
                   ),
                 ),
 
