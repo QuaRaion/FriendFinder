@@ -27,7 +27,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
         body: Container(
           alignment: Alignment. center,
-          padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
           height: MediaQuery.of(context).size.height,
           width: double.infinity,
           child: Column(
