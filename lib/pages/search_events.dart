@@ -40,138 +40,166 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: accentColor,
-      body: Column(
-        children: [
-          const SizedBox(height: 100),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(60.0),
-                  topRight: Radius.circular(60.0),
+      body: Padding(
+        padding: MediaQuery.of(context).size.width > 600
+            ? EdgeInsets.symmetric(horizontal: (MediaQuery.of(context).size.width - 430) * 0.49,)
+            : EdgeInsets.zero,
+        child: Column(
+          children: [
+            const SizedBox(height: 100),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(60.0),
+                    topRight: Radius.circular(60.0),
+                  ),
                 ),
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 30),
-                          child: Text(
-                            "Найти событие",
-                            style: TextStyle(
-                              fontSize: 35,
-                              color: blackColor,
-                              fontWeight: FontWeight.bold,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 30),
+                            child: Text(
+                              "Найти событие",
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: blackColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Чем хочешь заняться?",
-                            style: TextStyle(
-                              color: blackColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8.0),
+                                child: Text(
+                                  "Чем хочешь заняться?",
+                                  style: TextStyle(
+                                    color: blackColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: buildTextField("Прогуляться в парке..."),
+                              ),
+                            ],
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: buildTextField("Прогуляться в парке..."),
-
-                        ),
-                        const SizedBox(height: 20),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Выбери день",
-                            style: TextStyle(
-                              color: blackColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: buildDateTextField("Дата"),
-                        ),
-                        const SizedBox(height: 20),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Выбери время",
-                            style: TextStyle(
-                              color: blackColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 5),
-                          child: TimeInputField(hintText: "со скольки"),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: TimeInputField(hintText: "до скольки"),
-                        ),
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
 
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Количество человек",
-                            style: TextStyle(
-                              color: blackColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8.0),
+                                child: Text(
+                                  "Выбери день",
+                                  style: TextStyle(
+                                    color: blackColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: buildDateTextField("Дата"),
+                              ),
+                            ],
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: buildNumTextField("Количество"),
-                        ),
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
 
-                        MaterialButton(
-                          minWidth: 150,
-                          height: 70,
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const MapPage()));
-                          },
-                          color: accentColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 8.0),
+                                child: Text(
+                                  "Выбери время",
+                                  style: TextStyle(
+                                    color: blackColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 5),
+                                child: TimeInputField(hintText: "со скольки"),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 10),
+                                child: TimeInputField(hintText: "до скольки"),
+                              ),
+                            ],
                           ),
-                          child: const Text(
-                            "Найти",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30,
+                          const SizedBox(height: 20),
+
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8.0),
+                                child: Text(
+                                  "Количество человек",
+                                  style: TextStyle(
+                                    color: blackColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: buildNumTextField("Количество"),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+
+                          MaterialButton(
+                            minWidth: 150,
+                            height: 60,
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const MapPage()));
+                            },
+                            color: accentColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: const Text(
+                              "Найти",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 30,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

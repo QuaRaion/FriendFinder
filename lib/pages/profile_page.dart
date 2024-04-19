@@ -16,45 +16,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: accentColor,
-      body: Column(
-        children: [
-          const SizedBox(height: 100),
-          Expanded(
-            child: Container(
-              constraints: const BoxConstraints.expand(),
-              padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(60.0),
-                  topRight: Radius.circular(60.0),
+      body: Padding(
+          padding: MediaQuery.of(context).size.width > 600
+              ? EdgeInsets.symmetric(horizontal: (MediaQuery.of(context).size.width - 430) * 0.49,)
+              : EdgeInsets.zero,
+        child: Column(
+          children: [
+            const SizedBox(height: 100),
+            Expanded(
+              child: Container(
+                constraints: const BoxConstraints.expand(),
+                padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(60.0),
+                    topRight: Radius.circular(60.0),
+                  ),
                 ),
-              ),
-              child: const SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 30),
-                          child: Text(
-                            "Мой профиль",
-                            style: TextStyle(
-                              fontSize: 35,
-                              color: blackColor,
-                              fontWeight: FontWeight.bold,
+                child: const SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 30),
+                            child: Text(
+                              "Мой профиль",
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: blackColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }

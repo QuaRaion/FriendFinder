@@ -98,7 +98,7 @@ class _MapPageState extends State<MapPage> {
                       print('Изображение нажато');
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SearchScreen()),
+                        MaterialPageRoute(builder: (context) => const CreateScreen()),
                       );
                     },
                     child: Image.asset(
@@ -147,7 +147,7 @@ class _MapPageState extends State<MapPage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const CreateScreen()),
+                      MaterialPageRoute(builder: (context) => const SearchScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -161,7 +161,7 @@ class _MapPageState extends State<MapPage> {
                     minimumSize: const Size(200, 50),
                   ),
                   child: const Text(
-                    'Создать событие',
+                    'Найти событие',
                     style: TextStyle(
                       color:Colors.white,
                       fontSize: 22,
