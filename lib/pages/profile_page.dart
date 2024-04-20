@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(bottom: 30),
                         child: Text(
                           "Мой профиль",
@@ -56,12 +56,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                       Stack(
                         children: [
-                          Positioned(
+                          const Positioned(
                             right: 16,
                             child: CircleAvatar(
                               radius: 70,
                               // Здесь должен быть ваш аватар
-                              backgroundImage: AssetImage('assets/img/lahta.jpg'),
+                              backgroundImage: AssetImage('assets/img/logo.png'),
                             ),
                           ),
                           Row(
@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: accentColor,
                                     iconSize: 40,
                                   ),
-                                  Text(
+                                  const Text(
                                     "ЛАХТАМЕТ",
                                     style: TextStyle(
                                       fontSize: 39,
@@ -88,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   SizedBox(height: 5),
-                                  Text(
+                                  const Text(
                                     "Описание профиля",
                                     style: TextStyle(
                                       fontSize: 20,

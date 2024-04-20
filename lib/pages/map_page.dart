@@ -6,7 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:vers2/design/colors.dart';
 import 'search_events.dart';
 import 'create_events.dart';
-import 'profile_page.dart';
+// import 'profile_page.dart';
+import 'time.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({
@@ -103,8 +104,8 @@ class _MapPageState extends State<MapPage> {
                     },
                     child: Image.asset(
                       'assets/img/add_events.png',
-                      width: 100,
-                      height: 100,
+                      width: 110,
+                      height: 110,
                     ),
                   ),
                 ],
@@ -115,7 +116,8 @@ class _MapPageState extends State<MapPage> {
             bottom: 16,
             left: 16,
             right: 16,
-            child: Row(
+            child:
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Stack(
