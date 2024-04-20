@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
 import 'package:vers2/design/colors.dart';
 import 'map_page.dart';
 import 'create_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'search_events.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -44,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(bottom: 30),
                         child: Text(
                           "Мой профиль",
@@ -54,256 +53,214 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      ), // Добавляем отступ после иконки
+                      Stack(
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Лахтавлад",
-                                style: TextStyle(
-                                  height: 1,
-                                  fontSize: 40,
-                                  color: accentColor,
-                                  fontWeight: FontWeight.bold,
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100), // половина ширины и высоты контейнера
+                              child: Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: AssetImage('assets/img/lahta.jpg'),
+                                  ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: null,
-                                // действия при нажатии на кнопку редактирования профиля
-                                style: ButtonStyle(
-                                  padding:
-                                  MaterialStatePropertyAll(EdgeInsets.zero),
-                                  alignment: Alignment.topLeft,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.edit,
-                                      size: Checkbox.width,
-                                    ),
-                                    SizedBox(
-                                      width: 2,
-                                    ),
-                                    Text(
-                                      "Редактировать профиль",
-                                      style: TextStyle(
-                                        color: greyColor,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
+                            ),
                           ),
-                          CircleAvatar(
-                            radius: 55,
-                            // Здесь должен быть аватар пользователя
-                            backgroundImage:
-                            AssetImage('assets/img/avatar.jpeg'),
+                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      print('Изображение нажато');
+                                      // Ваши действия при нажатии
+                                    },
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.settings, color: accentColor, size: 40), // Ваша иконка
+                                        SizedBox(width: 10), // Отступ между иконкой и текстом
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  const Text(
+                                    "Лахта",
+                                    style: TextStyle(
+                                      fontSize: 39,
+                                      color: accentColor,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  const Row(
+                                    children: [
+                                      Icon(Icons.edit, color: Colors.grey, size: 20), // Иконка редактирования
+                                      SizedBox(width: 5), // Отступ между иконкой и текстом
+                                      Text(
+                                        "Редактировать профиль",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 40,
-                      ),
+
+                      SizedBox(height: 20), // Добавляем отступ после аватара
+
                       Column(
                         children: [
+
                           SizedBox(
                             width: double.infinity,
-                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: const Icon(
-                                Icons.people_alt_rounded,
-                                color: accentColor,
-                                size: 32,
-                              ),
-                              label: const Text(
-                                'Друзья',
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              icon: Icon(Icons.person_2, color: accentColor), // Указываем цвет иконки
+                              label: Text('Друзья', style: TextStyle(color: blackColor, fontSize: 20,)), // Указываем цвет текста
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: whiteColor,
-                                alignment: Alignment.centerLeft,
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
+                                backgroundColor: Colors.white, // Задаем белый цвет фона
+                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
+                                alignment: Alignment.centerLeft,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 15),
+
+                          SizedBox(height: 10), // Отступ между кнопками
 
                           SizedBox(
                             width: double.infinity,
-                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: const Icon(
-                                Icons.calendar_today_rounded,
-                                color: accentColor,
-                                size: 32,
-                              ),
-                              label: const Text(
-                                'Мои события',
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              icon: Icon(Icons.calendar_month, color: accentColor),
+                              label: Text('Мои события',style: TextStyle(color: blackColor, fontSize: 20,)),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: whiteColor,
-                                alignment: Alignment.centerLeft,
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                              ),
-                            ),
-                          ), // Отступ между кнопками
-                          const SizedBox(height: 15),
-
-                          SizedBox(
-                            width: double.infinity,
-                            height: 70,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // Действие при нажатии на кнопку
-                              },
-                              icon: const Icon(
-                                Icons.favorite_rounded,
-                                color: accentColor,
-                                size: 32,
-                              ),
-                              label: const Text(
-                                'Любимые события',
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: whiteColor,
                                 alignment: Alignment.centerLeft,
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 15),
+
+                          SizedBox(height: 10),
 
                           SizedBox(
                             width: double.infinity,
-                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: const Icon(
-                                Icons.local_fire_department_rounded,
-                                color: accentColor,
-                                size: 32,
-                              ),
-                              label: const Text(
-                                'Популярные события',
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              icon: Icon(Icons.heart_broken, color: accentColor),
+                              label: Text('Любимые события',style: TextStyle(color: blackColor, fontSize: 20,)),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: whiteColor,
-                                alignment: Alignment.centerLeft,
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
+                                alignment: Alignment.centerLeft,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 15),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Material(
-                                elevation: 4, // Высота тени
-                                shadowColor: Colors.black.withOpacity(0.6),
-                                shape: const CircleBorder(),
-                                color: whiteColor.withOpacity(0.9),
-                                child: SizedBox(
-                                  width: 65,
-                                  height: 65,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      // Действие при нажатии на кнопку
+                          SizedBox(height: 10),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                // Действие при нажатии на кнопку
+                              },
+                              icon: Icon(Icons.lock, color: accentColor),
+                              label: Text('Безопасность',style: TextStyle(color: blackColor, fontSize: 20,)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                alignment: Alignment.centerLeft,
+                              ),
+                            ),
+                          ),
+
+
+
+
+                          Padding(
+                            padding: const EdgeInsets.only(top: 100),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    // Действие при нажатии на кнопку
+                                  },
+                                  icon: Icon(CupertinoIcons.location_fill),
+                                  color: accentColor,
+                                  iconSize: 40,
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      print('Изображение нажато');
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const CreateScreen()),
+                                      );
                                     },
-                                    icon: const Icon(CupertinoIcons.globe,
-                                        size: 50),
-                                    color: accentColor,
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        'assets/img/add_events.png',
+                                        width: 100,
+                                        height: 100,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  print('Изображение нажато');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                        const CreateScreen()),
-                                  );
-                                },
-                                child: Image.asset(
-                                  'assets/img/add_events.png',
-                                  width: 100,
-                                  height: 100,
+                                IconButton(
+                                  onPressed: () {
+                                    print('Изображение нажато');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                                    );
+                                  },
+                                  icon: Icon(Icons.person),
+                                  color: accentColor,
+                                  iconSize: 50,
                                 ),
-                              ),
-
-                              Material(
-                                elevation: 4, // Высота тени
-                                shadowColor: Colors.black.withOpacity(0.6),
-                                shape: const CircleBorder(),
-                                color: whiteColor.withOpacity(0.9),
-                                child: SizedBox(
-                                  width: 65,
-                                  height: 65,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      // Действие при нажатии на кнопку
-                                    },
-                                    icon: const Icon(CupertinoIcons.person_fill,
-                                        size: 50),
-                                    color: accentColor,
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+
+
                         ],
                       ),
                     ],
@@ -317,3 +274,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+
