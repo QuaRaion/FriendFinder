@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:vers2/design/colors.dart';
 import 'map_page.dart';
 import 'create_events.dart';
@@ -53,149 +55,226 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-
-                      Stack(
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Positioned(
-                            right: 16,
-                            child: CircleAvatar(
-                              radius: 70,
-                              // Здесь должен быть ваш аватар
-                              backgroundImage: AssetImage('assets/img/logo.png'),
-                            ),
-                          ),
-                          Row(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      print('Изображение нажато');
-                                      // Фокусировка карты на геолокации пользователя
-                                    },
-                                    icon: const Icon(Icons.settings),
-                                    color: accentColor,
-                                    iconSize: 40,
-                                  ),
-                                  const Text(
-                                    "ЛАХТАМЕТ",
-                                    style: TextStyle(
-                                      fontSize: 39,
-                                      color: accentColor,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  const Text(
-                                    "Описание профиля",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                "Лахтавлад",
+                                style: TextStyle(
+                                  height: 1,
+                                  fontSize: 40,
+                                  color: accentColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                              TextButton(
+                                onPressed: null,
+                                // действия при нажатии на кнопку редактирования профиля
+                                style: ButtonStyle(
+                                  padding:
+                                  MaterialStatePropertyAll(EdgeInsets.zero),
+                                  alignment: Alignment.topLeft,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.edit,
+                                      size: Checkbox.width,
+                                    ),
+                                    SizedBox(
+                                      width: 2,
+                                    ),
+                                    Text(
+                                      "Редактировать профиль",
+                                      style: TextStyle(
+                                        color: greyColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
                             ],
                           ),
+                          CircleAvatar(
+                            radius: 55,
+                            // Здесь должен быть аватар пользователя
+                            backgroundImage:
+                            AssetImage('assets/img/avatar.jpeg'),
+                          ),
                         ],
+                      ),
+                      const SizedBox(
+                        height: 40,
                       ),
                       Column(
                         children: [
                           SizedBox(
                             width: double.infinity,
+                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.person_2),
-                              label: Text('Друзья'),
+                              icon: const Icon(
+                                Icons.people_alt_rounded,
+                                color: accentColor,
+                                size: 32,
+                              ),
+                              label: const Text(
+                                'Друзья',
+                                style: TextStyle(
+                                  color: blackColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: accentColor,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                backgroundColor: whiteColor,
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                alignment: Alignment.centerLeft,
                               ),
                             ),
                           ),
-                          SizedBox(height: 10), // Отступ между кнопками
+                          const SizedBox(height: 15),
+
                           SizedBox(
                             width: double.infinity,
+                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.calendar_month),
-                              label: Text('Мои события'),
+                              icon: const Icon(
+                                Icons.calendar_today_rounded,
+                                color: accentColor,
+                                size: 32,
+                              ),
+                              label: const Text(
+                                'Мои события',
+                                style: TextStyle(
+                                  color: blackColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: accentColor,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                backgroundColor: whiteColor,
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                alignment: Alignment.centerLeft,
                               ),
                             ),
-                          ),
-                          SizedBox(height: 10),
+                          ), // Отступ между кнопками
+                          const SizedBox(height: 15),
+
                           SizedBox(
                             width: double.infinity,
+                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.heart_broken),
-                              label: Text('Любимые события'),
+                              icon: const Icon(
+                                Icons.favorite_rounded,
+                                color: accentColor,
+                                size: 32,
+                              ),
+                              label: const Text(
+                                'Любимые события',
+                                style: TextStyle(
+                                  color: blackColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: accentColor,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                backgroundColor: whiteColor,
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                alignment: Alignment.centerLeft,
                               ),
                             ),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 15),
+
                           SizedBox(
                             width: double.infinity,
+                            height: 70,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.lock),
-                              label: Text('Безопасность'),
+                              icon: const Icon(
+                                Icons.local_fire_department_rounded,
+                                color: accentColor,
+                                size: 32,
+                              ),
+                              label: const Text(
+                                'Популярные события',
+                                style: TextStyle(
+                                  color: blackColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: accentColor,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                backgroundColor: whiteColor,
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                alignment: Alignment.centerLeft,
                               ),
                             ),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 15),
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  // Действие при нажатии на кнопку
-                                },
-                                icon: Icon(CupertinoIcons.location_fill),
-                                color: accentColor,
-                                iconSize: 40,
+                              Material(
+                                elevation: 4, // Высота тени
+                                shadowColor: Colors.black.withOpacity(0.6),
+                                shape: const CircleBorder(),
+                                color: whiteColor.withOpacity(0.9),
+                                child: SizedBox(
+                                  width: 65,
+                                  height: 65,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      // Действие при нажатии на кнопку
+                                    },
+                                    icon: const Icon(CupertinoIcons.globe,
+                                        size: 50),
+                                    color: accentColor,
+                                  ),
+                                ),
                               ),
                               GestureDetector(
                                 onTap: () {
                                   print('Изображение нажато');
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const CreateScreen()),
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const CreateScreen()),
                                   );
                                 },
                                 child: Image.asset(
@@ -204,17 +283,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   height: 100,
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  print('Изображение нажато');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                                  );
-                                },
-                                icon: Icon(Icons.person),
-                                color: accentColor,
-                                iconSize: 50,
+
+                              Material(
+                                elevation: 4, // Высота тени
+                                shadowColor: Colors.black.withOpacity(0.6),
+                                shape: const CircleBorder(),
+                                color: whiteColor.withOpacity(0.9),
+                                child: SizedBox(
+                                  width: 65,
+                                  height: 65,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      // Действие при нажатии на кнопку
+                                    },
+                                    icon: const Icon(CupertinoIcons.person_fill,
+                                        size: 50),
+                                    color: accentColor,
+                                  ),
+                                ),
                               ),
                             ],
                           ),

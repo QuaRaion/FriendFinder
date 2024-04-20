@@ -6,8 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:vers2/design/colors.dart';
 import 'search_events.dart';
 import 'create_events.dart';
-// import 'profile_page.dart';
-import 'time.dart';
+import 'profile_page.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({
