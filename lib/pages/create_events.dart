@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:vers2/design/colors.dart';
-import 'map_page.dart';
 
 class CreateScreen extends StatefulWidget {
-  const CreateScreen({super.key});
+  final LatLng coordinates;
+  const CreateScreen({Key? key, required this.coordinates}) : super(key: key);
 
   @override
   _CreateScreenState createState() => _CreateScreenState();
@@ -13,13 +13,11 @@ class CreateScreen extends StatefulWidget {
 
 class _CreateScreenState extends State<CreateScreen> {
   DateTime? _selectedDate;
-  TextEditingController _dateController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _dateController.text = 'Выберите дату';
-  }
+  TimeOfDay? _selectedTimeFrom;
+  TimeOfDay? _selectedTimeTo;
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _peopleController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -36,13 +34,42 @@ class _CreateScreenState extends State<CreateScreen> {
     }
   }
 
+  Future<void> _selectTime(BuildContext context, bool isFrom) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        if (isFrom) {
+          _selectedTimeFrom = picked;
+        } else {
+          _selectedTimeTo = picked;
+        }
+      });
+    }
+  }
+
+  void _createEvent() {
+    Navigator.pop(context, {
+      'title': _titleController.text,
+      'date': _dateController.text,
+      'timeFrom': _selectedTimeFrom?.format(context) ?? 'N/A',
+      'timeTo': _selectedTimeTo?.format(context) ?? 'N/A',
+      'people': _peopleController.text,
+      'coordinates': widget.coordinates,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: accentColor,
       body: Padding(
         padding: MediaQuery.of(context).size.width > 600
-            ? EdgeInsets.symmetric(horizontal: (MediaQuery.of(context).size.width - 430) * 0.49,)
+            ? EdgeInsets.symmetric(
+          horizontal: (MediaQuery.of(context).size.width - 430) * 0.49,
+        )
             : EdgeInsets.zero,
         child: Column(
           children: [
@@ -73,130 +100,40 @@ class _CreateScreenState extends State<CreateScreen> {
                               ),
                             ),
                           ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 8.0),
-                              child: Text(
-                                "Чем хочешь заняться?",
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          buildTextField(_titleController, "Прогуляться в парке..."),
+                          const SizedBox(height: 20),
+                          buildDateTextField(),
+                          const SizedBox(height: 20),
+                          buildTimeTextField("со скольки", true),
+                          const SizedBox(height: 5),
+                          buildTimeTextField("до скольки", false),
+                          const SizedBox(height: 20),
+                          buildNumTextField(_peopleController, "Количество"),
+                          const SizedBox(height: 20),
+                          MaterialButton(
+                            minWidth: 170,
+                            height: 60,
+                            onPressed: _createEvent,
+                            color: accentColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: const Text(
+                              "Создать",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 30,
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: buildTextField("Прогуляться в парке..."),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 8.0),
-                              child: Text(
-                                "Выбери день",
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: buildDateTextField("Дата"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-
-
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 8.0),
-                              child: Text(
-                                "Выбери время",
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 5),
-                              child: TimeInputField(hintText: "со скольки"),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 10),
-                              child: TimeInputField(hintText: "до скольки"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 8.0),
-                              child: Text(
-                                "Количество человек",
-                                style: TextStyle(
-                                  color: blackColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: buildNumTextField("Количество"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-
-
-                        MaterialButton(
-                          minWidth: 170,
-                          height: 60,
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const MapPage()));
-                          },
-                          color: accentColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Text(
-                            "Создать",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                  ],
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
             ),
           ],
         ),
@@ -204,7 +141,7 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget buildTextField(String hintText) {
+  Widget buildTextField(TextEditingController controller, String hintText) {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -216,6 +153,7 @@ class _CreateScreenState extends State<CreateScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20),
         child: TextField(
+          controller: controller,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w400,
@@ -227,14 +165,13 @@ class _CreateScreenState extends State<CreateScreen> {
               color: greyColor,
               fontSize: 18,
             ),
-
           ),
         ),
       ),
     );
   }
 
-  Widget buildDateTextField(String hintText) {
+  Widget buildDateTextField() {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -261,9 +198,9 @@ class _CreateScreenState extends State<CreateScreen> {
                   fontSize: 18,
                 ),
               )
-                  : Text(
-                hintText,
-                style: const TextStyle(
+                  : const Text(
+                'Выберите дату',
+                style: TextStyle(
                   color: greyColor,
                   fontWeight: FontWeight.w400,
                   fontSize: 18,
@@ -277,73 +214,17 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget buildNumTextField(String hintText) {
-    return Container(
-      height: 60,
-      constraints: const BoxConstraints(maxWidth: 400),
-      decoration: BoxDecoration(
-        color: whiteColor,
-        border: Border.all(color: greyColor),
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20),
-        child: TextField(
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w400),
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hintText,
-            hintStyle: const TextStyle(
-              color: greyColor,
-              fontSize: 18,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class TimeInputField extends StatefulWidget {
-  final String hintText;
-
-  const TimeInputField({Key? key, required this.hintText}) : super(key: key);
-
-  @override
-  _TimeInputFieldState createState() => _TimeInputFieldState();
-}
-
-class _TimeInputFieldState extends State<TimeInputField> {
-  TimeOfDay? _selectedTime;
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildTimeTextField(String hintText, bool isFrom) {
     return GestureDetector(
       onTap: () {
-        _selectTime(context);
+        _selectTime(context, isFrom);
       },
       child: Container(
         height: 60,
         constraints: const BoxConstraints(maxWidth: 400),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.grey),
+          color: whiteColor,
+          border: Border.all(color: greyColor),
           borderRadius: BorderRadius.circular(50),
         ),
         child: Padding(
@@ -352,17 +233,46 @@ class _TimeInputFieldState extends State<TimeInputField> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _selectedTime != null
-                    ? '${_selectedTime!.hour}:${_selectedTime!.minute}'
-                    : widget.hintText,
-                style: TextStyle(
-                  color: _selectedTime != null ? Colors.black : Colors.grey,
+                (isFrom ? _selectedTimeFrom?.format(context) : _selectedTimeTo?.format(context)) ?? hintText,
+                style: const TextStyle(
+                  color: blackColor,
                   fontWeight: FontWeight.w400,
                   fontSize: 18,
                 ),
               ),
               const Icon(Icons.access_time),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildNumTextField(TextEditingController controller, String hintText) {
+    return Container(
+        height: 60,
+        constraints: const BoxConstraints(maxWidth: 400),
+      decoration: BoxDecoration(
+        color: whiteColor,
+        border: Border.all(color: greyColor),
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20),
+        child: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+          ),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: hintText,
+            hintStyle: const TextStyle(
+              color: greyColor,
+              fontSize: 18,
+            ),
           ),
         ),
       ),

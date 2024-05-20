@@ -49,6 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
             const SizedBox(height: 100),
             Expanded(
               child: Container(
+                width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
                 decoration: const BoxDecoration(
                   color: Colors.white,

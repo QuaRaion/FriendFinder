@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vers2/design/colors.dart';
+import 'package:vers2/pages/settings_page.dart';
 import 'map_page.dart';
 import 'create_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'search_events.dart';
+import 'settings_page.dart';
 
 
 class ProfileScreen extends StatefulWidget {
@@ -43,56 +45,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(bottom: 30),
                         child: Text(
                           "Мой профиль",
                           style: TextStyle(
-                            fontSize: 35,
+                            fontSize: 40,
                             color: blackColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ), // Добавляем отступ после иконки
+                      ),
                       Stack(
                         children: [
                           Positioned(
                             bottom: 0,
                             right: 0,
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100), // половина ширины и высоты контейнера
+                              borderRadius: BorderRadius.circular(100),
                               child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
+                                width: 100,
+                                height: 100,
+                                decoration: const BoxDecoration(
                                   image: DecorationImage(
                                     fit: BoxFit.cover,
-                                    image: AssetImage('assets/img/lahta.jpg'),
+                                    image: AssetImage('assets/img/avatar.jpeg'),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                           Row(
+                           const Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  InkWell(
-                                    onTap: () {
-                                      print('Изображение нажато');
-                                      // Ваши действия при нажатии
-                                    },
-                                    child: const Row(
-                                      children: [
-                                        Icon(Icons.settings, color: accentColor, size: 40), // Ваша иконка
-                                        SizedBox(width: 10), // Отступ между иконкой и текстом
-                                      ],
-                                    ),
-                                  ),
                                   SizedBox(height: 20),
-                                  const Text(
+                                  Text(
                                     "Лахта",
                                     style: TextStyle(
                                       fontSize: 39,
@@ -101,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   SizedBox(height: 5),
-                                  const Row(
+                                  Row(
                                     children: [
                                       Icon(Icons.edit, color: Colors.grey, size: 20), // Иконка редактирования
                                       SizedBox(width: 5), // Отступ между иконкой и текстом
@@ -122,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 20), // Добавляем отступ после аватара
+                      const SizedBox(height: 20),
 
                       Column(
                         children: [
@@ -133,11 +123,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.person_2, color: accentColor), // Указываем цвет иконки
-                              label: Text('Друзья', style: TextStyle(color: blackColor, fontSize: 20,)), // Указываем цвет текста
+                              icon: const Icon(Icons.people_alt_rounded,
+                                  color: accentColor,
+                                  size: 30,
+                              ), // Указываем цвет иконки
+                              label: const Text('Друзья', style: TextStyle(color: blackColor, fontSize: 22,)), // Указываем цвет текста
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white, // Задаем белый цвет фона
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
@@ -146,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
 
-                          SizedBox(height: 10), // Отступ между кнопками
+                          const SizedBox(height: 20),
 
                           SizedBox(
                             width: double.infinity,
@@ -154,11 +147,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.calendar_month, color: accentColor),
-                              label: Text('Мои события',style: TextStyle(color: blackColor, fontSize: 20,)),
+                              icon: const Icon(Icons.calendar_month,
+                                color: accentColor,
+                                size: 30,
+                              ),
+                              label: const Text('Мои события',style: TextStyle(color: blackColor, fontSize: 22,)),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
@@ -167,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
 
-                          SizedBox(height: 10),
+                          const SizedBox(height: 20),
 
                           SizedBox(
                             width: double.infinity,
@@ -175,11 +171,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: Icon(Icons.heart_broken, color: accentColor),
-                              label: Text('Любимые события',style: TextStyle(color: blackColor, fontSize: 20,)),
+                              icon: const Icon(Icons.favorite,
+                                  color: accentColor,
+                                  size: 30,
+                              ),
+                              label: const Text('Любимые события',
+                                  style: TextStyle(
+                                    color: blackColor,
+                                    fontSize: 22,)),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
@@ -188,51 +190,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
 
-                          SizedBox(height: 10),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // Действие при нажатии на кнопку
-                              },
-                              icon: Icon(Icons.lock, color: accentColor),
-                              label: Text('Безопасность',style: TextStyle(color: blackColor, fontSize: 20,)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                alignment: Alignment.centerLeft,
-                              ),
-                            ),
-                          ),
-
-
-
+                          const SizedBox(height: 80),
 
                           Padding(
                             padding: const EdgeInsets.only(top: 100),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                IconButton(
-                                  onPressed: () {
-                                    // Действие при нажатии на кнопку
+                                InkWell(
+                                  onTap: () {
+                                    print('Нажата кнопка открытия карты');
+                                    Navigator.pop(context);
                                   },
-                                  icon: Icon(CupertinoIcons.location_fill),
-                                  color: accentColor,
-                                  iconSize: 40,
+                                  child: Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 3, // Радиус рассеивания тени
+                                          blurRadius: 9, // Радиус размытия тени
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.map_rounded,
+                                      color: accentColor,
+                                      size: 45,
+                                    ),
+                                  ),
+
                                 ),
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
-                                      print('Изображение нажато');
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const CreateScreen()),
-                                      );
+                                      print('Кнопка создания события нажата');
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(builder: (context) => const CreateScreen()),
+                                      // );
                                     },
                                     child: Align(
                                       alignment: Alignment.center,
@@ -244,18 +243,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {
-                                    print('Изображение нажато');
+                                InkWell(
+                                  onTap: () {
+                                    print('Нажата кнопка открытия настроек');
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
                                     );
                                   },
-                                  icon: Icon(Icons.person),
-                                  color: accentColor,
-                                  iconSize: 50,
+                                  child: Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 3, // Радиус рассеивания тени
+                                          blurRadius: 9, // Радиус размытия тени
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.settings,
+                                      color: accentColor,
+                                      size: 50,
+                                    ),
+                                  ),
+
                                 ),
+
                               ],
                             ),
                           ),
