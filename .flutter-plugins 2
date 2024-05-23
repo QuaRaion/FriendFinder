@@ -1,0 +1,26 @@
+# This is a generated file; do not edit or check into version control.
+cloud_firestore=/Users/isherz/.pub-cache/hosted/pub.dev/cloud_firestore-4.17.3/
+cloud_firestore_web=/Users/isherz/.pub-cache/hosted/pub.dev/cloud_firestore_web-3.12.3/
+firebase_core=/Users/isherz/.pub-cache/hosted/pub.dev/firebase_core-2.31.0/
+firebase_core_web=/Users/isherz/.pub-cache/hosted/pub.dev/firebase_core_web-2.17.0/
+flutter_native_splash=/Users/isherz/.pub-cache/hosted/pub.dev/flutter_native_splash-2.4.0/
+flutter_osm_plugin=/Users/isherz/.pub-cache/hosted/pub.dev/flutter_osm_plugin-1.0.5/
+flutter_osm_web=/Users/isherz/.pub-cache/hosted/pub.dev/flutter_osm_web-1.0.3/
+flutter_plugin_android_lifecycle=/Users/isherz/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.19/
+geolocator=/Users/isherz/.pub-cache/hosted/pub.dev/geolocator-11.1.0/
+geolocator_android=/Users/isherz/.pub-cache/hosted/pub.dev/geolocator_android-4.6.0/
+geolocator_apple=/Users/isherz/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.7/
+geolocator_web=/Users/isherz/.pub-cache/hosted/pub.dev/geolocator_web-3.0.0/
+geolocator_windows=/Users/isherz/.pub-cache/hosted/pub.dev/geolocator_windows-0.2.3/
+permission_handler=/Users/isherz/.pub-cache/hosted/pub.dev/permission_handler-11.3.1/
+permission_handler_android=/Users/isherz/.pub-cache/hosted/pub.dev/permission_handler_android-12.0.6/
+permission_handler_apple=/Users/isherz/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.4/
+permission_handler_html=/Users/isherz/.pub-cache/hosted/pub.dev/permission_handler_html-0.1.1/
+permission_handler_windows=/Users/isherz/.pub-cache/hosted/pub.dev/permission_handler_windows-0.2.1/
+url_launcher=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher-6.2.6/
+url_launcher_android=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.2/
+url_launcher_ios=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.0/
+url_launcher_linux=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher_linux-3.1.1/
+url_launcher_macos=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.0/
+url_launcher_web=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher_web-2.3.1/
+url_launcher_windows=/Users/isherz/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.1/

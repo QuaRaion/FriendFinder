@@ -19,7 +19,6 @@ class MyFriendsScreen extends StatefulWidget {
 }
 
 class _MyFriendsScreenState extends State<MyFriendsScreen> {
-  DateTime? _selectedDate;
 
   @override
   Widget build(BuildContext context) {

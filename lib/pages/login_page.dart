@@ -5,8 +5,6 @@ import '../methods/registration_methods.dart';
 import 'map_page.dart';
 import 'signup.dart';
 
-import 'package:flutter_svg/flutter_svg.dart';
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
