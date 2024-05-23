@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'login_page.dart';
 import 'package:vers2/design/colors.dart';
-// import 'create_events.dart';
 
 void main() {
   runApp(const MaterialApp(

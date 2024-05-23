@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../design/colors.dart';
 import 'login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -49,14 +50,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white, // Устанавливаем цвет кнопки
+                                  backgroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
                                   ),
@@ -124,6 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
+                                FirebaseAuth.instance.signOut();
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -160,7 +161,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 130),
 
                           Padding(
-                            padding: const EdgeInsets.only(top: 100),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -179,8 +180,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.grey.withOpacity(0.3),
-                                          spreadRadius: 3, // Радиус рассеивания тени
-                                          blurRadius: 9, // Радиус размытия тени
+                                          spreadRadius: 2,
+                                          blurRadius: 8,
                                         ),
                                       ],
                                     ),
@@ -190,27 +191,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       size: 45,
                                     ),
                                   ),
-
                                 ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      print('Кнопка создания события нажата');
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(builder: (context) => const CreateScreen()),
-                                      // );
-                                    },
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Image.asset(
-                                        'assets/img/add_events.png',
-                                        width: 100,
-                                        height: 100,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Expanded(
+                                //   child: GestureDetector(
+                                //     onTap: () {
+                                //       print('Кнопка создания события нажата');
+                                //       // Navigator.push(
+                                //       //   context,
+                                //       //   MaterialPageRoute(builder: (context) => const CreateScreen()),
+                                //       // );
+                                //     },
+                                //     child: Align(
+                                //       alignment: Alignment.center,
+                                //       child: Image.asset(
+                                //         'assets/img/add_events.png',
+                                //         width: 100,
+                                //         height: 100,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                                 InkWell(
                                   onTap: () {
                                     print('Нажата кнопка закрытия настроек');
@@ -225,8 +225,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.grey.withOpacity(0.3),
-                                          spreadRadius: 3, // Радиус рассеивания тени
-                                          blurRadius: 9, // Радиус размытия тени
+                                          spreadRadius: 3,
+                                          blurRadius: 9,
                                         ),
                                       ],
                                     ),

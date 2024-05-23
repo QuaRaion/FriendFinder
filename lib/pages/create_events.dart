@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:vers2/design/colors.dart';
+import '../methods/event_model.dart';
+import '../methods/event_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class CreateScreen extends StatefulWidget {
   final LatLng coordinates;
@@ -15,9 +20,12 @@ class _CreateScreenState extends State<CreateScreen> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTimeFrom;
   TimeOfDay? _selectedTimeTo;
+  final TextEditingController _timeFromController = TextEditingController();
+  final TextEditingController _timeToController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _peopleController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -43,22 +51,79 @@ class _CreateScreenState extends State<CreateScreen> {
       setState(() {
         if (isFrom) {
           _selectedTimeFrom = picked;
+          _timeFromController.text = _formatTime(picked);
         } else {
           _selectedTimeTo = picked;
+          _timeToController.text = _formatTime(picked);
         }
       });
     }
   }
 
-  void _createEvent() {
-    Navigator.pop(context, {
-      'title': _titleController.text,
-      'date': _dateController.text,
-      'timeFrom': _selectedTimeFrom?.format(context) ?? 'N/A',
-      'timeTo': _selectedTimeTo?.format(context) ?? 'N/A',
-      'people': _peopleController.text,
-      'coordinates': widget.coordinates,
-    });
+  String _formatTime(TimeOfDay? time) {
+    if (time == null) {
+      return '';
+    }
+    final now = DateTime.now();
+    final formattedTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat('HH:mm').format(formattedTime);
+  }
+
+
+  Future<String> _getCurrentUserEmail() async {
+    User? user = _auth.currentUser;
+    return user?.email ?? '';
+  }
+
+  Future<String> _getUsernameByEmail(String email) async {
+    String username = "Аноним";
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where("email", isEqualTo: email)
+          .get();
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data() as Map<String, dynamic>;
+        username = data['username'] ?? "Аноним";
+      }
+    } catch (e) {
+      print("Ошибка при получении имени пользователя: $e");
+    }
+    return username;
+  }
+
+  void _createEvent() async {
+    String email = await _getCurrentUserEmail();
+    String username = await _getUsernameByEmail(email);
+
+    CollectionReference eventsCollection = FirebaseFirestore.instance.collection('events');
+    DocumentReference newEventDoc = eventsCollection.doc();
+    String newEventId = newEventDoc.id;
+
+
+    Event event = Event(
+      id: newEventId,
+      title: _titleController.text,
+      date: _dateController.text,
+      timeFrom: _timeFromController.text,
+      timeTo: _timeToController.text,
+      peopleCount: _peopleController.text,
+      latitude: widget.coordinates.latitude,
+      longitude: widget.coordinates.longitude,
+      creatorEmail: email,
+      creatorUsername: username,
+    );
+
+    print("Создание события: ${event.toMap()}");
+
+    try {
+      await EventService().createEvent(event, newEventId);
+      print("Событие успешно создано");
+    } catch (e) {
+      print("Ошибка при создании события: $e");
+    }
+
+    Navigator.pop(context, event);
   }
 
   @override
@@ -113,7 +178,8 @@ class _CreateScreenState extends State<CreateScreen> {
                           MaterialButton(
                             minWidth: 170,
                             height: 60,
-                            onPressed: _createEvent,
+                            onPressed:
+                            _createEvent,
                             color: accentColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(50),
@@ -250,8 +316,8 @@ class _CreateScreenState extends State<CreateScreen> {
 
   Widget buildNumTextField(TextEditingController controller, String hintText) {
     return Container(
-        height: 60,
-        constraints: const BoxConstraints(maxWidth: 400),
+      height: 60,
+      constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
         color: whiteColor,
         border: Border.all(color: greyColor),
@@ -279,4 +345,3 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 }
-

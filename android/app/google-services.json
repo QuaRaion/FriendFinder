@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "455613153926",
+    "project_id": "ffproject-e5faf",
+    "storage_bucket": "ffproject-e5faf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455613153926:android:c8f91b046f96e137c40707",
+        "android_client_info": {
+          "package_name": "com.example.vers2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOsPsEGq5DU4j5rBf9uzr3KJ_EnrPGpos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455613153926:android:0a4af317bf3b47eac40707",
+        "android_client_info": {
+          "package_name": "com.flutter.FF"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOsPsEGq5DU4j5rBf9uzr3KJ_EnrPGpos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

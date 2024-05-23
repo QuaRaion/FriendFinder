@@ -2,6 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -49,6 +50,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -58,6 +60,13 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    lintOptions {
+        warningsAsErrors true
+        disable 'deprecated'
+        warning 'deprecation'
+    }
+
 }
 
 flutter {
@@ -66,4 +75,5 @@ flutter {
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation platform('com.google.firebase:firebase-bom:31.0.0')
 }

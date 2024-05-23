@@ -7,6 +7,8 @@ import '../design/colors.dart';
 import 'search_events.dart';
 import 'create_events.dart';
 import 'profile_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -18,10 +20,8 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   late final MapController _mapController;
   LatLng? _userLocation;
-  int _selectedIndex = 0; // Индекс выбранного элемента нижней панели навигации
-
-  final List<Marker> _markers = []; // Список для хранения маркеров
-  bool _isLoading = true; // Показ индикатора загрузки
+  final List<Marker> _markers = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -59,6 +59,7 @@ class _MapPageState extends State<MapPage> {
       _addUserLocationMarker(_userLocation!);
       _mapController.move(_userLocation!, 15);
       _isLoading = false; // Скрываем индикатор загрузки после получения геолокации
+      _fetchEvents(); // Загрузка событий при получении геолокации пользователя
     });
   }
 
@@ -77,6 +78,35 @@ class _MapPageState extends State<MapPage> {
         ),
       );
     });
+  }
+
+
+  Future<void> _fetchEvents() async {
+    try {
+      final eventsSnapshot = await FirebaseFirestore.instance.collection('events').get();
+      final eventsData = eventsSnapshot.docs.map((doc) => doc.data()).toList();
+
+      setState(() {
+        _markers.clear();
+        _addUserLocationMarker(_userLocation!);
+
+        for (final eventData in eventsData) {
+          final LatLng position = LatLng(eventData['latitude'], eventData['longitude']);
+          final Map<String, dynamic> details = {
+            'creatorUsername': eventData['creatorUsername'],
+            'title': eventData['title'],
+            'date': eventData['date'],
+            'timeFrom': eventData['timeFrom'],
+            'timeTo': eventData['timeTo'],
+            'peopleCount': eventData['peopleCount'],
+          };
+
+          _addMarkerWithDetails(position, details);
+        }
+      });
+    } catch (e) {
+      print("Ошибка загрузки событий: $e");
+    }
   }
 
 
@@ -106,12 +136,12 @@ class _MapPageState extends State<MapPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(  markerData['title']?.isNotEmpty == true ? markerData['title']! : 'Не знает чем заняться...',
-        style: const TextStyle(
-          color: accentColor,
-          fontWeight: FontWeight.w700,
-          fontSize: 22,
-        )
+        title: Text(markerData['title']?.isNotEmpty == true ? markerData['title']! : 'Не знает чем заняться...',
+            style: const TextStyle(
+              color: accentColor,
+              fontWeight: FontWeight.w700,
+              fontSize: 22,
+            )
         ),
         content: RichText(
           text: TextSpan(
@@ -122,18 +152,35 @@ class _MapPageState extends State<MapPage> {
             ),
             children: [
               const TextSpan(
+                text: 'Пользователь: ',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: blackColor,
+                  height: 1.7,
+                ),
+              ),
+              TextSpan(text: '${markerData['creatorUsername']}\n',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: blackColor
+                ),
+              ),
+              const TextSpan(
                 text: 'Дата: ',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: blackColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: blackColor,
+                  height: 1.7,
                 ),
               ),
               TextSpan(text: '${markerData['date']}\n',
                 style: const TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16,
-                    color: blackColor
+                    color: blackColor,
                 ),
               ),
 
@@ -147,11 +194,11 @@ class _MapPageState extends State<MapPage> {
                 ),
               ),
               TextSpan(text: '${markerData['timeFrom']}\n',
-              style: const TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  color: blackColor
-              ),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: blackColor
+                ),
               ),
               const TextSpan(
                 text: 'До скольки: ',
@@ -161,7 +208,8 @@ class _MapPageState extends State<MapPage> {
                   color: blackColor,
                   height: 1.7,
 
-                ),              ),
+                ),
+              ),
               TextSpan(text: '${markerData['timeTo']}\n',
                 style: const TextStyle(
                     fontWeight: FontWeight.w400,
@@ -177,8 +225,9 @@ class _MapPageState extends State<MapPage> {
                   color: blackColor,
                   height: 1.7,
 
-                ),              ),
-              TextSpan(text: '${markerData['people']}',
+                ),
+              ),
+              TextSpan(text: '${markerData['peopleCount']}',
                 style: const TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16,
@@ -208,6 +257,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+
   void _onMapLongPress(TapPosition tapPosition, LatLng point) async {
     final result = await Navigator.push(
       context,
@@ -217,156 +267,149 @@ class _MapPageState extends State<MapPage> {
     if (result != null && result is Map<String, dynamic>) {
       _addMarkerWithDetails(point, result);
     }
-  }
+    _fetchEvents();
 
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
+        body: Stack(
+          children: [
           FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              // center: _userLocation ?? const LatLng(59.9343, 30.3351),
-              // zoom: 6,
-              onLongPress: _onMapLongPress,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.flutter_map_example',
-              ),
-              MarkerLayer(markers: _markers),
-            ],
+          mapController: _mapController,
+          options: MapOptions(
+            center: _userLocation ?? const LatLng(59.9343, 30.3351),
+            zoom: 10,
+            onLongPress: _onMapLongPress,
           ),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.flutter_map_example',
             ),
-          const Positioned(
-            bottom: 82,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
+            MarkerLayer(markers: _markers),
+          ],
+        ),
+        if (_isLoading)
+    const Center(
+      child: CircularProgressIndicator(),
+    ),
+    const Positioned(
+    bottom: 82,
+    left: 0,
+    right: 0,
+    child: Center(
+    child: Stack(
+    alignment: Alignment.center,
+    children: [
+      // GestureDetector(
+      //   onTap: () {
+      //     print('Нажата кнопка создания события');
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => CreateScreen(coordinates: _userLocation!)),
+      //     );
+      //
+      //   },
+      //   child: Image.asset(
+      //     'assets/img/add_events.png',
+      //     width: 110,
+      //     height: 110,
+      //   ),
+      // ),
+    ],
+    ),
+    ),
+    ),
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     print('Нажата кнопка создания события');
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(builder: (context) => CreateScreen(coordinates: _userLocation!)),
-                  //     );
-                  //
-                  //   },
-                  //   child: Image.asset(
-                  //     'assets/img/add_events.png',
-                  //     width: 110,
-                  //     height: 110,
-                  //   ),
-                  // ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          print('Нажата кнопка фокусировки карты на геолокации пользователя');
+                          _fetchEvents();
+                          if (_userLocation != null) {
+                            _mapController.move(_userLocation!, 15);
+                          }
+                        },
+                        icon: const Icon(CupertinoIcons.location_fill),
+                        color: accentColor,
+                        iconSize: 40,
+                      ),
+
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SearchScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      minimumSize: const Size(200, 50),
+                    ),
+                    child: const Text(
+                      'Найти событие',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          print('Нажата кнопка открытия профиля');
+                          _fetchEvents();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                          );
+                        },
+                        icon: const Icon(Icons.person),
+                        color: accentColor,
+                        iconSize: 50,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        print('Нажата кнопка фокусировки карты на геолокации пользователя');
-                        if (_userLocation != null) {
-                          _mapController.move(_userLocation!, 15);
-                        }
-                      },
-                      icon: const Icon(CupertinoIcons.location_fill),
-                      color: accentColor,
-                      iconSize: 40,
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SearchScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    minimumSize: const Size(200, 50),
-                  ),
-                  child: const Text(
-                    'Найти событие',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        print('Нажата кнопка открытия настроек');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                        );
-                      },
-                      icon: const Icon(Icons.person),
-                      color: accentColor,
-                      iconSize: 50,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 }

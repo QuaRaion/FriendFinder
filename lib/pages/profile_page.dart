@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vers2/design/colors.dart';
 import 'package:vers2/pages/settings_page.dart';
-import 'map_page.dart';
-import 'create_events.dart';
-import 'package:flutter/cupertino.dart';
-import 'search_events.dart';
-import 'settings_page.dart';
+import 'my_events.dart';
 
+import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -16,7 +15,33 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  DateTime? _selectedDate;
+  final FirebaseAuthService _authService = FirebaseAuthService();
+
+  Future<String> getUsernameByEmail(String email) async {
+    String username = "Аноним";
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where("email", isEqualTo: email)
+          .get();
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data() as Map<String, dynamic>;
+        username = data['username'] ?? "Аноним";
+      }
+    } catch (e) {
+      print("Ошибка при получении имени пользователя: $e");
+    }
+    return username;
+  }
+
+  Future<String> getUsername() async {
+    String? email = _authService.getCurrentUserEmail();
+    if (email != null) {
+      return await getUsernameByEmail(email);
+    } else {
+      return "Аноним";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,92 +94,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 decoration: const BoxDecoration(
                                   image: DecorationImage(
                                     fit: BoxFit.cover,
-                                    image: AssetImage('assets/img/avatar.jpeg'),
+                                    image: AssetImage('assets/img/avatar.png'),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                           const Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(height: 20),
-                                  Text(
-                                    "Лахта",
-                                    style: TextStyle(
-                                      fontSize: 39,
-                                      color: accentColor,
-                                      fontWeight: FontWeight.w800,
-                                    ),
+                          FutureBuilder<String>(
+                            future: getUsername(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return const Text(
+                                  "Ошибка загрузки данных",
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    color: accentColor,
+                                    fontWeight: FontWeight.w800,
                                   ),
-                                  SizedBox(height: 5),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.edit, color: Colors.grey, size: 20), // Иконка редактирования
-                                      SizedBox(width: 5), // Отступ между иконкой и текстом
-                                      Text(
-                                        "Редактировать профиль",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.grey,
+                                );
+                              } else {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          snapshot.data ?? "Аноним",
+                                          style: const TextStyle(
+                                            fontSize: 40,
+                                            color: accentColor,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          maxLines: 2, // Максимальное количество строк
+                                          overflow: TextOverflow.ellipsis, // Поведение при переполнении
                                         ),
-                                      ),
-                                    ],
-                                  ),
 
-                                ],
-                              ),
-                            ],
+                                        const SizedBox(height: 5),
+                                        const Row(
+                                          children: [
+                                            Icon(Icons.edit, color: Colors.grey, size: 20),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              "Редактировать профиль",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 20),
-
                       Column(
                         children: [
-
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 // Действие при нажатии на кнопку
                               },
-                              icon: const Icon(Icons.people_alt_rounded,
-                                  color: accentColor,
-                                  size: 30,
-                              ), // Указываем цвет иконки
-                              label: const Text('Друзья', style: TextStyle(color: blackColor, fontSize: 22,)), // Указываем цвет текста
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // Задаем белый цвет фона
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                alignment: Alignment.centerLeft,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // Действие при нажатии на кнопку
-                              },
-                              icon: const Icon(Icons.calendar_month,
+                              icon: const Icon(
+                                Icons.people_alt_rounded,
                                 color: accentColor,
                                 size: 30,
                               ),
-                              label: const Text('Мои события',style: TextStyle(color: blackColor, fontSize: 22,)),
+                              label: const Text(
+                                'Друзья',
+                                style: TextStyle(
+                                  color: blackColor,
+                                  fontSize: 22,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 30,
+                                  horizontal: 24,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
@@ -162,26 +190,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 20),
-
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                // Действие при нажатии на кнопку
+                                print('Нажата кнопка открытия моих событий');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      const MyEventsScreen()),
+                                );
                               },
-                              icon: const Icon(Icons.favorite,
-                                  color: accentColor,
-                                  size: 30,
+                              icon: const Icon(
+                                Icons.calendar_month,
+                                color: accentColor,
+                                size: 30,
                               ),
-                              label: const Text('Любимые события',
-                                  style: TextStyle(
-                                    color: blackColor,
-                                    fontSize: 22,)),
+                              label: const Text(
+                                'Мои события',
+                                style: TextStyle(
+                                  color: blackColor,
+                                  fontSize: 22,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 30,
+                                  horizontal: 24,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
@@ -189,17 +228,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ),
-
+                          const SizedBox(height: 20),
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   child: ElevatedButton.icon(
+                          //     onPressed: () {
+                          //       // Действие при нажатии на кнопку
+                          //     },
+                          //     icon: const Icon(
+                          //       Icons.favorite,
+                          //       color: accentColor,
+                          //       size: 30,
+                          //     ),
+                          //     label: const Text(
+                          //       'Любимые события',
+                          //       style: TextStyle(
+                          //         color: blackColor,
+                          //         fontSize: 22,
+                          //       ),
+                          //     ),
+                          //     style: ElevatedButton.styleFrom(
+                          //       backgroundColor: Colors.white,
+                          //       padding: const EdgeInsets.symmetric(
+                          //         vertical: 30,
+                          //         horizontal: 24,
+                          //       ),
+                          //       shape: RoundedRectangleBorder(
+                          //         borderRadius: BorderRadius.circular(50),
+                          //       ),
+                          //       alignment: Alignment.centerLeft,
+                          //     ),
+                          //   ),
+                          // ),
                           const SizedBox(height: 80),
-
                           Padding(
-                            padding: const EdgeInsets.only(top: 100),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 InkWell(
                                   onTap: () {
                                     print('Нажата кнопка открытия карты');
+                                    Navigator.pop(context);
                                     Navigator.pop(context);
                                   },
                                   child: Container(
@@ -211,8 +281,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.grey.withOpacity(0.3),
-                                          spreadRadius: 3, // Радиус рассеивания тени
-                                          blurRadius: 9, // Радиус размытия тени
+                                          spreadRadius: 2,
+                                          blurRadius: 8,
                                         ),
                                       ],
                                     ),
@@ -222,33 +292,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       size: 45,
                                     ),
                                   ),
-
                                 ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      print('Кнопка создания события нажата');
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(builder: (context) => const CreateScreen()),
-                                      // );
-                                    },
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Image.asset(
-                                        'assets/img/add_events.png',
-                                        width: 100,
-                                        height: 100,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Expanded(
+                                //   child: GestureDetector(
+                                //     onTap: () {
+                                //       print('Кнопка создания события нажата');
+                                //       // Navigator.push(
+                                //       //   context,
+                                //       //   MaterialPageRoute(builder: (context) => const CreateScreen()),
+                                //       // );
+                                //     },
+                                //     child: Align(
+                                //       alignment: Alignment.center,
+                                //       child: Image.asset(
+                                //         'assets/img/add_events.png',
+                                //         width: 100,
+                                //         height: 100,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                                 InkWell(
                                   onTap: () {
                                     print('Нажата кнопка открытия настроек');
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                          const SettingsScreen()),
                                     );
                                   },
                                   child: Container(
@@ -260,8 +331,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.grey.withOpacity(0.3),
-                                          spreadRadius: 3, // Радиус рассеивания тени
-                                          blurRadius: 9, // Радиус размытия тени
+                                          spreadRadius: 3,
+                                          blurRadius: 9,
                                         ),
                                       ],
                                     ),
@@ -271,13 +342,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       size: 50,
                                     ),
                                   ),
-
                                 ),
-
                               ],
                             ),
                           ),
-
 
                         ],
                       ),
@@ -293,4 +361,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
+class FirebaseAuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  String? getCurrentUserEmail() {
+    try {
+      User? user = _auth.currentUser;
+      return user?.email;
+    } catch (e) {
+      print("Ошибка при получении электронной почты пользователя: $e");
+    }
+    return null;
+  }
+}

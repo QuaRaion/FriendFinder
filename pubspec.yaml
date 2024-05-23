@@ -41,6 +41,10 @@ dependencies:
   flutter_datetime_picker: ^1.5.1
   flutter_svg: ^2.0.10+1
   intl: ^0.19.0
+  cloud_firestore: ^4.17.0
+  firebase_auth: ^4.19.2
+  firebase_storage: ^11.7.2
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_native_splash: ^2.4.0
@@ -54,8 +58,18 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
 
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+flutter_launcher_icons:
+  android: "launcher_icons"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/img/logo_white_with_frame.png"
+  adaptive_icon_background: "assets/img/background.png"
+  adaptive_icon_foreground: "assets/img/logo_white_with_frame.png"
+
+
 flutter_native_splash:
   image: assets/img/logo_white_big.png
   color: "#5A78FA"
