@@ -270,7 +270,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onTap: () {
                                     print('Нажата кнопка открытия карты');
                                     Navigator.pop(context);
-                                    Navigator.pop(context);
                                   },
                                   child: Container(
                                     width: 60,
