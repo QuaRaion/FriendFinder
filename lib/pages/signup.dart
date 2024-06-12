@@ -1,43 +1,120 @@
+import 'dart:convert';
+import 'dart:js';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
 import 'package:vers2/design/colors.dart';
-import '../methods/registration_methods.dart';
-import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'map_page.dart';
+import '../methods/registration_methods.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class SignUpCubit extends Cubit<SignUpState> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
 
-  @override
-  _SignUpPageState createState() => _SignUpPageState();
+  SignUpCubit() : super(SignUpInitial());
+
+  void signUp({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      User? user = await _auth.signUpWithEmailAndPassword(email, password);
+
+      if (user != null) {
+        print("User is successfully created");
+
+        // Add user data to database
+        await _addUserDataToDatabase(username, email, password);
+
+        emit(SignUpSuccess());
+      } else {
+        print("Error");
+        emit(SignUpFailure("Error during sign up"));
+      }
+    } catch (e) {
+      print("Error: $e");
+      emit(SignUpFailure(e.toString()));
+    }
+  }
+  String hash_Password(String password) {
+    var bytes = utf8.encode(password); // преобразование пароля в байтовый массив
+    var digest = sha256.convert(bytes); // хеширование с использованием SHA-256
+
+    return digest.toString(); // возвращаем хеш в виде строки
+  }
+
+  Future<void> _addUserDataToDatabase(String username, String email, String password) async {
+    final firestore = FirebaseFirestore.instance.collection("users");
+    String id = firestore.doc().id;
+
+    await firestore.doc(id).set({
+      "username": username,
+      "email": email,
+      "password": hash_Password(password),
+    });
+  }
 }
 
-class _SignUpPageState extends State<SignUpPage> {
-  final FirebaseAuthService _auth = FirebaseAuthService();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  bool _isEmailValid = true;
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  bool _isPasswordMatch = true;
+abstract class SignUpState {}
+
+class SignUpInitial extends SignUpState {}
+
+class SignUpSuccess extends SignUpState {}
+
+class SignUpFailure extends SignUpState {
+  final String errorMessage;
+
+  SignUpFailure(this.errorMessage);
+}
+
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(primaryColor: accentColor),
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
+    return BlocProvider(
+      create: (_) => SignUpCubit(),
+      child: SignUpView(),
+    );
+  }
+}
+
+class SignUpView extends StatelessWidget {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: BlocListener<SignUpCubit, SignUpState>(
+            listener: (context, state) {
+              if (state is SignUpSuccess) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MapPage()),
+                );
+              } else if (state is SignUpFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                  ),
+                );
+              }
+            },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -57,58 +134,35 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                buildLoginTextField('Имя пользователя'),
+                _buildLoginTextField('Имя пользователя'),
                 const SizedBox(height: 20),
-                buildEmailTextField('Почта'),
+                _buildEmailTextField('Почта'),
                 const SizedBox(height: 20),
-                buildTextField('Пароль должен содержать не менее 6 символов', obscureText: true, controller: _passwordController),
+                _buildTextField('Пароль должен содержать не менее 6 символов', obscureText: true, controller: _passwordController),
                 const SizedBox(height: 20),
-                buildTextField('Повторите пароль', obscureText: true, controller: _confirmPasswordController),
+                _buildTextField('Повторите пароль', obscureText: true, controller: _confirmPasswordController),
                 const SizedBox(height: 30),
-                // MaterialButton(
-                //   minWidth: double.infinity,
-                //   height: 60,
-                //   onPressed: () {
-                //     if (_isEmailValid) {
-                //       _signUp();
-                //     } else {
-                //       ScaffoldMessenger.of(context).showSnackBar(
-                //         const SnackBar(
-                //           content: Text('Введите корректный адрес электронной почты'),
-                //         ),
-                //       );
-                //     }
-                //   },
-                //   color: accentColor,
-                //   shape: RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.circular(50),
-                //   ),
-                //   child: const Text(
-                //     "Зарегистрироваться",
-                //     style: TextStyle(
-                //       color: Colors.white,
-                //       fontWeight: FontWeight.bold,
-                //       fontSize: 20,
-                //     ),
-                //   ),
-                // ),
                 MaterialButton(
                   minWidth: 350,
                   height: 80,
-
-
                   onPressed: () {
-                    // Проверка введенной почты перед переходом на другой экран
-                    if (_isEmailValid) {
-                      _signUp();
-                      //реализия сохранения ин-фы о пользователе в БД
+                    final username = _usernameController.text;
+                    final email = _emailController.text;
+                    final password = _passwordController.text;
+                    final confirmPassword = _confirmPasswordController.text;
+
+                    if (password == confirmPassword) {
+                      BlocProvider.of<SignUpCubit>(context).signUp(
+                        username: username,
+                        email: email,
+                        password: password,
+                      );
                     } else {
-                      // // Вывод сообщения об ошибке
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   SnackBar(
-                      //     content: Text('Введите корректный адрес электронной почты'),
-                      //   ),
-                      // );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Пароли не совпадают'),
+                        ),
+                      );
                     }
                   },
                   color: accentColor,
@@ -124,7 +178,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +212,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buildLoginTextField(String hintText) {
+  Widget _buildLoginTextField(String hintText) {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -186,14 +239,14 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buildEmailTextField(String hintText) {
+  Widget _buildEmailTextField(String hintText) {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-          color: _isEmailValid ? greyColor : Colors.red,
+          color: greyColor,
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -208,21 +261,12 @@ class _SignUpPageState extends State<SignUpPage> {
               color: greyColor,
             ),
           ),
-          onChanged: (value) {
-            setState(() {
-              _isEmailValid = RegExp(
-                // r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$",
-                r"^[a-zA-Z0-9+_.]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$",
-
-              ).hasMatch(value);
-            });
-          },
         ),
       ),
     );
   }
 
-  Widget buildTextField(String hintText, {bool obscureText = false, required TextEditingController controller}) {
+  Widget _buildTextField(String hintText, {bool obscureText = false, required TextEditingController controller}) {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -230,7 +274,7 @@ class _SignUpPageState extends State<SignUpPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: _isPasswordMatch ? greyColor : Colors.red,
+            color: greyColor
         ),
       ),
       child: Padding(
@@ -240,9 +284,9 @@ class _SignUpPageState extends State<SignUpPage> {
           controller: controller,
           onChanged: (value) {
             if (controller == _passwordController || controller == _confirmPasswordController) {
-              setState(() {
-                _isPasswordMatch = _passwordController.text == _confirmPasswordController.text;
-              });
+              BlocProvider.of<SignUpCubit>(context as BuildContext).emit(PasswordMatchChanged(
+                isMatch: _passwordController.text == _confirmPasswordController.text,
+              ));
             }
           },
           decoration: InputDecoration(
@@ -256,37 +300,11 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
     );
   }
-
-  String hash_Password(String password) {
-    var bytes = utf8.encode(password);
-    var digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  void _signUp() async {
-    String username = _usernameController.text;
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    String hashPassword = hash_Password(password);
-
-    User? user = await _auth.signUpWithEmailAndPassword(email, password);
-
-    if (user != null) {
-      print("User is successfully created");
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MapPage()));
-    } else {
-      print("Error");
-    }
-
-    final firestore = FirebaseFirestore.instance.collection("users");
-    String id = firestore.doc().id;
-
-    await firestore.doc(id).set({
-      "username": username,
-      "email": email,
-      "password": hashPassword,
-    });
-  }
 }
+
+class PasswordMatchChanged extends SignUpState {
+  final bool isMatch;
+
+  PasswordMatchChanged({required this.isMatch});
+}
+

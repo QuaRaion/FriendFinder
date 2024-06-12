@@ -1,33 +1,49 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:vers2/design/colors.dart';
 import '../methods/registration_methods.dart';
 import 'map_page.dart';
 import 'signup.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuthService _auth = FirebaseAuthService();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: accentColor),
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
+      home: BlocProvider<LoginCubit>(
+        create: (context) => LoginCubit(),
+        child: const LoginForm(),
+      ),
+    );
+  }
+}
 
-        body: Container(
-          alignment: Alignment. center,
+class LoginForm extends StatelessWidget {
+  const LoginForm({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: BlocListener<LoginCubit, User?>(
+        listener: (context, user) {
+          if (user != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MapPage()),
+            );
+          }
+        },
+        child: Container(
+          alignment: Alignment.center,
           padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
           height: MediaQuery.of(context).size.height,
           width: double.infinity,
@@ -38,35 +54,37 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        const Padding(padding: EdgeInsets.only(top: 120),),
+                        const Padding(padding: EdgeInsets.only(top: 120)),
                         Image.asset(
                           'assets/img/logo.png',
                           width: 100,
                           height: 100,
                         ),
-                        const Padding(padding: EdgeInsets.only(bottom: 20),),
-                        const Text("Вход",
-                            style: TextStyle(
-                                fontSize: 35,
-                                color: blackColor,
-                                fontWeight: FontWeight.bold
-                            )
+                        const Padding(padding: EdgeInsets.only(bottom: 20)),
+                        const Text(
+                          "Вход",
+                          style: TextStyle(
+                            fontSize: 35,
+                            color: blackColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const Padding(padding: EdgeInsets.only(bottom: 30),)
+                        const Padding(padding: EdgeInsets.only(bottom: 30)),
                       ],
                     ),
-
-
-                    buildLoginTextField('Адрес электронной почты'),
-                    const Padding(padding: EdgeInsets.only(bottom: 20),),
-                    buildTextField('Пароль'),
-                    const Padding(padding: EdgeInsets.only(bottom: 30),),
+                    _buildLoginTextField('Адрес электронной почты', _emailController),
+                    const Padding(padding: EdgeInsets.only(bottom: 20)),
+                    _buildTextField('Пароль', _passwordController),
+                    const Padding(padding: EdgeInsets.only(bottom: 30)),
 
                     MaterialButton(
                       minWidth: 200,
                       height: 70,
                       onPressed: () {
-                        _signIn();
+                        BlocProvider.of<LoginCubit>(context).signIn(
+                          _emailController.text,
+                          _passwordController.text,
+                        );
                       },
                       color: accentColor,
                       shape: RoundedRectangleBorder(
@@ -82,28 +100,32 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
 
-                    const Padding(padding: EdgeInsets.only(bottom: 20),),
-
+                    const Padding(padding: EdgeInsets.only(bottom: 20)),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        const Text("Нет аккаунта? ", style: TextStyle(
-                          color: greyColor,
-                          fontSize: 18,
-                        ),),
+                        const Text(
+                          "Нет аккаунта? ",
+                          style: TextStyle(
+                            color: greyColor,
+                            fontSize: 18,
+                          ),
+                        ),
                         GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const SignUpPage()),
-                              );
-                            },
-                            child: const Text("Зарегистрироваться", style: TextStyle(
-
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SignUpPage()),
+                            );
+                          },
+                          child: const Text(
+                            "Зарегистрироваться",
+                            style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 18,
-                            ),)
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -117,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget buildLoginTextField(String hintText) {
+  Widget _buildLoginTextField(String hintText, TextEditingController controller) {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -131,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 20.0),
         child: TextField(
-          controller: _emailController,
+          controller: controller,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
@@ -144,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget buildTextField(String hintText) {
+  Widget _buildTextField(String hintText, TextEditingController controller) {
     return Container(
       height: 60,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -156,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 20.0),
         child: TextField(
-          controller: _passwordController,
+          controller: controller,
           obscureText: true,
           decoration: InputDecoration(
             border: InputBorder.none,
@@ -169,22 +191,22 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-  void _signIn() async {
-    String email = _emailController.text;
-    String password = _passwordController.text;
+}
 
+class LoginCubit extends Cubit<User?> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+  LoginCubit() : super(null);
+
+  Future<void> signIn(String email, String password) async {
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
     if (user != null) {
       print("Пользователь зарегистрирован");
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MapPage()));
-    }
-    else{
+      emit(user);
+    } else {
       print("Ошибка регистрации");
+      emit(null);
     }
   }
-
 }
-

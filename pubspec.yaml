@@ -36,19 +36,17 @@ dependencies:
   flutter_osm_plugin: ^1.0.5
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
-  provider: ^6.1.2
-
   flutter_map_cancellable_tile_provider: ^2.0.0
   geolocator: ^11.0.0
   flutter_datetime_picker: ^1.5.1
-  flutter_launcher_icons: ^0.13.1
   flutter_svg: ^2.0.10+1
   intl: ^0.19.0
-
-#  FIREBASE
   cloud_firestore: ^4.17.0
   firebase_auth: ^4.19.2
   firebase_storage: ^11.7.2
+  flutter_launcher_icons: ^0.13.1
+  flutter_bloc: ^8.0.0
+  equatable: ^2.0.3
 
 dev_dependencies:
   flutter_native_splash: ^2.4.0

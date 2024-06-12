@@ -1,74 +1,69 @@
-import 'package:flutter/material.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vers2/design/colors.dart';
 import '../methods/event_model.dart';
 import '../methods/event_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vers2/design/colors.dart';
 
+class CreateEventState {
+  final DateTime? selectedDate;
+  final TimeOfDay? selectedTimeFrom;
+  final TimeOfDay? selectedTimeTo;
+  final bool isLoading;
 
-class CreateScreen extends StatefulWidget {
-  final LatLng coordinates;
-  const CreateScreen({Key? key, required this.coordinates}) : super(key: key);
-
-  @override
-  _CreateScreenState createState() => _CreateScreenState();
+  CreateEventState({
+    this.selectedDate,
+    this.selectedTimeFrom,
+    this.selectedTimeTo,
+    this.isLoading = false,
+  });
 }
 
-class _CreateScreenState extends State<CreateScreen> {
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTimeFrom;
-  TimeOfDay? _selectedTimeTo;
-  final TextEditingController _timeFromController = TextEditingController();
-  final TextEditingController _timeToController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _peopleController = TextEditingController();
+class CreateEventCubit extends Cubit<CreateEventState> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        _dateController.text = DateFormat('dd.MM.yyyy').format(picked);
-      });
-    }
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeFromController = TextEditingController();
+  final TextEditingController timeToController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController peopleCountController = TextEditingController();
+
+  CreateEventCubit() : super(CreateEventState());
+
+  void selectDate(DateTime date) {
+    dateController.text = DateFormat('dd.MM.yyyy').format(date);
+    emit(CreateEventState(
+      selectedDate: date,
+      selectedTimeFrom: state.selectedTimeFrom,
+      selectedTimeTo: state.selectedTimeTo,
+      isLoading: state.isLoading,
+    ));
   }
 
-  Future<void> _selectTime(BuildContext context, bool isFrom) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isFrom) {
-          _selectedTimeFrom = picked;
-          _timeFromController.text = _formatTime(picked);
-        } else {
-          _selectedTimeTo = picked;
-          _timeToController.text = _formatTime(picked);
-        }
-      });
-    }
+  void selectTimeFrom(TimeOfDay time) {
+    timeFromController.text = _formatTime(time);
+    emit(CreateEventState(
+      selectedDate: state.selectedDate,
+      selectedTimeFrom: time,
+      selectedTimeTo: state.selectedTimeTo,
+      isLoading: state.isLoading,
+    ));
   }
 
-  String _formatTime(TimeOfDay? time) {
-    if (time == null) {
-      return '';
-    }
-    final now = DateTime.now();
-    final formattedTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    return DateFormat('HH:mm').format(formattedTime);
+  void selectTimeTo(TimeOfDay time) {
+    timeToController.text = _formatTime(time);
+    emit(CreateEventState(
+      selectedDate: state.selectedDate,
+      selectedTimeFrom: state.selectedTimeFrom,
+      selectedTimeTo: time,
+      isLoading: state.isLoading,
+    ));
   }
-
 
   Future<String> _getCurrentUserEmail() async {
     User? user = _auth.currentUser;
@@ -92,7 +87,14 @@ class _CreateScreenState extends State<CreateScreen> {
     return username;
   }
 
-  void _createEvent() async {
+  Future<void> createEvent(BuildContext context, LatLng coordinates) async {
+    emit(CreateEventState(
+      selectedDate: state.selectedDate,
+      selectedTimeFrom: state.selectedTimeFrom,
+      selectedTimeTo: state.selectedTimeTo,
+      isLoading: true,
+    ));
+
     String email = await _getCurrentUserEmail();
     String username = await _getUsernameByEmail(email);
 
@@ -100,16 +102,15 @@ class _CreateScreenState extends State<CreateScreen> {
     DocumentReference newEventDoc = eventsCollection.doc();
     String newEventId = newEventDoc.id;
 
-
     Event event = Event(
       id: newEventId,
-      title: _titleController.text,
-      date: _dateController.text,
-      timeFrom: _timeFromController.text,
-      timeTo: _timeToController.text,
-      peopleCount: _peopleController.text,
-      latitude: widget.coordinates.latitude,
-      longitude: widget.coordinates.longitude,
+      title: titleController.text,
+      date: dateController.text,
+      timeFrom: timeFromController.text,
+      timeTo: timeToController.text,
+      peopleCount: peopleCountController.text,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
       creatorEmail: email,
       creatorUsername: username,
     );
@@ -123,85 +124,147 @@ class _CreateScreenState extends State<CreateScreen> {
       print("Ошибка при создании события: $e");
     }
 
-    Navigator.pop(context, event);
+    emit(CreateEventState(
+      selectedDate: state.selectedDate,
+      selectedTimeFrom: state.selectedTimeFrom,
+      selectedTimeTo: state.selectedTimeTo,
+      isLoading: false,
+    ));
+
+    Navigator.pop(context);
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final formattedTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat('HH:mm').format(formattedTime);
+  }
+}
+
+class CreateScreen extends StatelessWidget {
+  final LatLng coordinates;
+  const CreateScreen({Key? key, required this.coordinates}) : super(key: key);
+
+  Future<void> _selectDate(BuildContext context, CreateEventCubit cubit) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      cubit.selectDate(picked);
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, bool isFrom, CreateEventCubit cubit) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      isFrom ? cubit.selectTimeFrom(picked) : cubit.selectTimeTo(picked);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: accentColor,
-      body: Padding(
-        padding: MediaQuery.of(context).size.width > 600
-            ? EdgeInsets.symmetric(
-          horizontal: (MediaQuery.of(context).size.width - 430) * 0.49,
-        )
-            : EdgeInsets.zero,
-        child: Column(
-          children: [
-            const SizedBox(height: 100),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60.0),
-                    topRight: Radius.circular(60.0),
+    return BlocProvider(
+      create: (_) => CreateEventCubit(),
+      child: Scaffold(
+        backgroundColor: accentColor,
+        body: Padding(
+          padding: MediaQuery.of(context).size.width > 600
+              ? EdgeInsets.symmetric(
+            horizontal: (MediaQuery.of(context).size.width - 430) * 0.49,
+          )
+              : EdgeInsets.zero,
+          child: Column(
+            children: [
+              const SizedBox(height: 100),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(60.0),
+                      topRight: Radius.circular(60.0),
+                    ),
                   ),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          const Padding(
-                            padding: EdgeInsets.only(bottom: 30),
-                            child: Text(
-                              "Создать событие",
-                              style: TextStyle(
-                                fontSize: 35,
-                                color: blackColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 30),
+                          child: Text(
+                            "Создать событие",
+                            style: TextStyle(
+                              fontSize: 35,
+                              color: blackColor,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          buildTextField(_titleController, "Прогуляться в парке..."),
-                          const SizedBox(height: 20),
-                          buildDateTextField(),
-                          const SizedBox(height: 20),
-                          buildTimeTextField("со скольки", true),
-                          const SizedBox(height: 5),
-                          buildTimeTextField("до скольки", false),
-                          const SizedBox(height: 20),
-                          buildNumTextField(_peopleController, "Количество"),
-                          const SizedBox(height: 20),
-                          MaterialButton(
-                            minWidth: 170,
-                            height: 60,
-                            onPressed:
-                            _createEvent,
-                            color: accentColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: const Text(
-                              "Создать",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 30,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ],
+                        ),
+                        BlocBuilder<CreateEventCubit, CreateEventState>(
+                          builder: (context, state) {
+                            final cubit = context.read<CreateEventCubit>();
+                            return Column(
+                              children: <Widget>[
+                                buildTextField(
+                                    cubit.titleController,
+                                    "Прогуляться в парке..."),
+                                const SizedBox(height: 20),
+                                buildDateTextField(context, state, cubit),
+                                const SizedBox(height: 20),
+                                buildTimeTextField(
+                                    context,
+                                    "со скольки",
+                                    true,
+                                    state,
+                                    cubit),
+                                const SizedBox(height: 5),
+                                buildTimeTextField(
+                                    context,
+                                    "до скольки",
+                                    false,
+                                    state,
+                                    cubit),
+                                const SizedBox(height: 20),
+                                buildNumTextField(
+                                    cubit.peopleCountController,
+                                    "Количество"),
+                                const SizedBox(height: 20),
+                                MaterialButton(
+                                  minWidth: 170,
+                                  height: 60,
+                                  onPressed: () =>
+                                      cubit.createEvent(context, coordinates),
+                                  color: accentColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: const Text(
+                                    "Создать",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -225,8 +288,7 @@ class _CreateScreenState extends State<CreateScreen> {
             fontWeight: FontWeight.w400,
           ),
           decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hintText,
+            border: InputBorder.none,hintText: hintText,
             hintStyle: const TextStyle(
               color: greyColor,
               fontSize: 18,
@@ -237,79 +299,20 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget buildDateTextField() {
-    return Container(
-      height: 60,
-      constraints: const BoxConstraints(maxWidth: 400),
-      decoration: BoxDecoration(
-        color: whiteColor,
-        border: Border.all(color: greyColor),
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: GestureDetector(
-        onTap: () {
-          _selectDate(context);
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _selectedDate != null
-                  ? Text(
-                DateFormat('dd.MM.yyyy').format(_selectedDate!),
-                style: const TextStyle(
-                  color: blackColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18,
-                ),
-              )
-                  : const Text(
-                'Выберите дату',
-                style: TextStyle(
-                  color: greyColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18,
-                ),
-              ),
-              const Icon(Icons.calendar_today),
-            ],
-          ),
-        ),
+  Widget buildDateTextField(BuildContext context, CreateEventState state, CreateEventCubit cubit) {
+    return GestureDetector(
+      onTap: () => _selectDate(context, cubit),
+      child: AbsorbPointer(
+        child: buildTextField(cubit.dateController, "Выберите дату"),
       ),
     );
   }
 
-  Widget buildTimeTextField(String hintText, bool isFrom) {
+  Widget buildTimeTextField(BuildContext context, String hintText, bool isFrom, CreateEventState state, CreateEventCubit cubit) {
     return GestureDetector(
-      onTap: () {
-        _selectTime(context, isFrom);
-      },
-      child: Container(
-        height: 60,
-        constraints: const BoxConstraints(maxWidth: 400),
-        decoration: BoxDecoration(
-          color: whiteColor,
-          border: Border.all(color: greyColor),
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                (isFrom ? _selectedTimeFrom?.format(context) : _selectedTimeTo?.format(context)) ?? hintText,
-                style: const TextStyle(
-                  color: blackColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18,
-                ),
-              ),
-              const Icon(Icons.access_time),
-            ],
-          ),
-        ),
+      onTap: () => _selectTime(context, isFrom, cubit),
+      child: AbsorbPointer(
+        child: buildTextField(isFrom ? cubit.timeFromController : cubit.timeToController, hintText),
       ),
     );
   }

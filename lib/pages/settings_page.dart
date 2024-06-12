@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../design/colors.dart';
 import 'login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
-
-  @override
-  _SettingsScreenState createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +154,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           const SizedBox(height: 130),
-
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                             child: Row(
@@ -191,27 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       size: 45,
                                     ),
                                   ),
-                                ),
-                                // Expanded(
-                                //   child: GestureDetector(
-                                //     onTap: () {
-                                //       print('Кнопка создания события нажата');
-                                //       // Navigator.push(
-                                //       //   context,
-                                //       //   MaterialPageRoute(builder: (context) => const CreateScreen()),
-                                //       // );
-                                //     },
-                                //     child: Align(
-                                //       alignment: Alignment.center,
-                                //       child: Image.asset(
-                                //         'assets/img/add_events.png',
-                                //         width: 100,
-                                //         height: 100,
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
-                                InkWell(
+                                ),                                InkWell(
                                   onTap: () {
                                     print('Нажата кнопка закрытия настроек');
                                     Navigator.pop(context);
@@ -253,3 +227,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+
